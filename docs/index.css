@@ -29,7 +29,7 @@ input, textarea {
     resize: vertical;
     font-family: Arial, Helvetica, sans-serif;
     padding: 5px;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     width: 100%;
 }
 input::placeholder, textarea::placeholder {
@@ -43,7 +43,7 @@ input[type=number] {
     margin: 10px auto;
     background-color: #DDD;
     padding: 10px;
-    font-size: 1rem;
+    font-size: 1.2rem;
     text-align: left;
 }
 
