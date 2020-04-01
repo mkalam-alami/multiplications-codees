@@ -1,30 +1,48 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Multiplications codées</title>
   <link rel="stylesheet" style="text/css" href="index.css" />
 </head>
+
 <body>
   <div id="app" v-cloak>
     <h1>Multiplications codées</h1>
-    
+
+    <div class="form">
+      <div>
+        <h2>Encoder</h2>
+        <textarea v-model="encodeInput"></textarea>
+        <p class="output" v-if="encodeOutput">{{ encodeOutput }}</p>
+      </div>
+      <div>
+        <h2>Décoder</h2>
+        <textarea v-model="decodeInput" v-bind:placeholder="'Exemple : ' + encode('LOL')"></textarea>
+        <p class="output" v-if="decodeOutput">{{ decodeOutput }}</p>
+      </div>
+    </div>
+
     <table class="grid">
       <thead>
         <tr>
           <th class="corner">x</th>
-          <th v-for="i in constants.GRID_SIZE">{{ i }}</th>
+          <th v-for="i in gridSize">{{ i }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="i in constants.GRID_SIZE">
+        <tr v-for="i in gridSize">
           <th>{{ i }}</th>
-          <td v-for="j in constants.GRID_SIZE">{{ j * i }}</td>
+          <td v-for="j in gridSize">{{ decodeMultiplication(i, j) }}</td>
         </tr>
       </tbody>
     </table>
+
+    <p class="seed">Graine de génération du tableau : <input type="number" v-model="seed" /></p>
 
   </div>
   <script src="./bundle.js"></script>
   <script src="/reload/reload.js"></script>
 </body>
+
 </html>

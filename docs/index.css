@@ -9,9 +9,48 @@ body {
     visibility: hidden;
 }
 
+h1, h2 {
+    margin-bottom: 10px;
+}
+
+.form {
+    display: flex;
+    margin: auto;
+    max-width: 600px;
+    flex-wrap: wrap;
+}
+.form > div {
+    flex: 1;
+    min-width: 280px;
+    padding: 10px;
+}
+
+input, textarea {
+    resize: vertical;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 5px;
+    font-size: 1.5rem;
+    width: 100%;
+}
+input::placeholder, textarea::placeholder {
+    font-size: 1rem;
+}
+input[type=number] {
+    width: 100px;
+}
+
+.output {
+    margin: 10px auto;
+    background-color: #DDD;
+    padding: 10px;
+    font-size: 1rem;
+    text-align: left;
+}
+
 .grid {
     border-collapse: collapse;
     margin: auto;
+    margin-top: 30px;
     max-width: 600px;
     border: 2px solid black;
 }
@@ -40,4 +79,11 @@ td {
     font-size: 1rem;
     text-align: center;
     border: 1px dotted gray;
+}
+
+.seed {
+    font-size: 0.9rem;
+}
+.seed input {
+    font-size: 0.9rem;
 }
