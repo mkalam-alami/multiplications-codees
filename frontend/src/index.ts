@@ -37,7 +37,7 @@ new Vue({
   el: '#app',
   data: {
     gridSize: loadNumber('gridSize', 12),
-    seed: loadNumber('seed', 1),
+    seed: loadNumber('seed', 1).toString(),
     encodeInput: load('encodeInput'),
     decodeInput: load('decodeInput'),
     decodingTable: {},
@@ -49,17 +49,16 @@ new Vue({
   },
   methods: {
     applySeed() {
-      this.reverseTable = generateReverseTable(parseInt(this.gridSize, 10));
-      this.decodingTable = generateDecodingTable(parseInt(this.seed, 10), this.reverseTable);
+      this.decodingTable = generateDecodingTable(this.gridSize, parseInt(this.seed, 10));
     },
     encode(message: string) {
-      return encodeMessage(message, this.decodingTable, this.reverseTable);
+      return encodeMessage(message, this.decodingTable);
     },
     decode(message: string) {
       return decodeMessage(message, this.decodingTable);
     },
     decodeMultiplication(i: number, j: number) {
-      return decodeMultiplication({ i, j }, this.decodingTable);
+      return decodeResult(i * j, this.decodingTable);
     }
   },
   computed: {
@@ -78,8 +77,11 @@ new Vue({
       save('decodeInput', value);
     },
     seed(value) {
-      save('seed', value);
-      this.applySeed();
+      const seedNumber = parseInt(value);
+      if (seedNumber && !isNaN(seedNumber)) {
+        save('seed', value);
+        this.applySeed();
+      }
     }
   }
 })
@@ -94,12 +96,8 @@ function save(key: string, value: string) {
 }
 
 function loadNumber(key: string, defaultValue = 0): number {
-  try {
-    const value = parseInt(load(key), 10);
-    if (isNaN(value)) throw new Error();
-  } catch (e) {
-    return defaultValue;
-  }
+  const value = parseInt(load(key), 10);
+  return (typeof value !== "number" || isNaN(value)) ? defaultValue : value;
 }
 
 function load(key: string): string {
@@ -111,56 +109,85 @@ function load(key: string): string {
 
 // ========= ENCODING / DECODING =========
 
-function encodeMessage(message: string, decodingTable: DecodingTable, reverseTable: ReverseTable) {
-  const localRandom = randomGenerator(message);
+function encodeMessage(message: string, decodingTable: DecodingTable) {
+  const localRandom = randomGenerator(hash(message));
   const sanitizedMessage = message.trim().toUpperCase().replace(/[^A-Z ]/g, ' ');
   return sanitizedMessage
     .split('')
-    .map(letter => encodeLetter(letter, decodingTable, reverseTable, localRandom))
+    .map(letter => encodeLetter(letter, decodingTable, localRandom))
     .join(' ');
 }
 
-function encodeLetter(letter: string, decodingTable: DecodingTable, reverseTable: ReverseTable, random: Function) {
+function encodeLetter(letter: string, decodingTable: DecodingTable, random: Function) {
   const matchingResults = Object.entries(decodingTable).filter((entry) => entry[1] === letter);
-  const matchingMultiplications = matchingResults
-    .map(entry => entry[0])
-    .map<Multiplication[]>(result => reverseTable[result])
-    .reduce((prev, value) => prev.concat(value), []);
-  const chosenIndex = Math.floor(random() * matchingMultiplications.length);
-  const multiplication = matchingMultiplications[chosenIndex];
-  if (multiplication) {
-    return `${multiplication.i}x${multiplication.j}`;
-  } else {
-    log.error(`No multiplication found for letter "${letter}"`);
-    return '???';
+  const chosenResultIndex = Math.floor(random() * matchingResults.length);
+  if (matchingResults.length === 0) {
+    console.log(Object.values(decodingTable).join(''));
+    console.log(letter, matchingResults, chosenResultIndex)
   }
+  return matchingResults[chosenResultIndex][0];
 }
 
 function decodeMessage(message: string, decodingTable: DecodingTable) {
-  const sanitizedMessage = message.trim().toLowerCase().replace(/[^0-9 x]/g, '');
+  const sanitizedMessage = message.trim().toLowerCase().replace(/[^0-9 ]/g, '');
   return sanitizedMessage
     .split(/ +/)
-    .map(multiplicationString => {
-      const multiplicationElements = multiplicationString.split('x');
-      if (multiplicationElements.length === 2) {
-        return {
-          i: parseInt(multiplicationElements[0], 10),
-          j: parseInt(multiplicationElements[1], 10)
-        };
-      } else {
-        return undefined;
-      }
+    .map(resultString => {
+      const result = parseInt(resultString, 10);
+      return (Boolean(result)) ? result : undefined;
     })
     .filter(Boolean)
-    .map(multiplication => decodeMultiplication(multiplication, decodingTable))
+    .map(result => decodeResult(result, decodingTable))
     .join('');
 }
 
-function decodeMultiplication(multiplication: Multiplication, decodingTable: DecodingTable): string {
-  return decodingTable[multiplication.i * multiplication.j];
+function decodeResult(result: number, decodingTable: DecodingTable): string {
+  return decodingTable[result];
 }
 
 // ========= TABLE GENERATION =========
+
+function generateDecodingTable(gridSize: number, seed: number): DecodingTable {
+  const reverseTable = generateReverseTable(gridSize);
+  const occurrences: Occurrence[] = [];
+  for (const result of Object.keys(reverseTable) as any as number[]) {
+    occurrences.push({
+      result,
+      times: reverseTable[result].length
+    });
+  }
+
+  const availablePoints = gridSize * gridSize;
+  const pointValue = availablePoints / Object.values(LETTER_DISTRIBUTION).reduce((p, v) => p + v, 0);
+  let remainingPointsPerLetter: Record<Letter, number> = {}
+  for (const letter of Object.keys(LETTER_DISTRIBUTION)) {
+    remainingPointsPerLetter[letter] = pointValue * LETTER_DISTRIBUTION[letter];
+  }
+  
+  const decodingTable: DecodingTable = {};
+  const random = randomGenerator(seed);
+  for (const occurrence of occurrences) {
+    const letters = Object.keys(remainingPointsPerLetter);
+    if (letters.length > 0) {
+      let attempts = 0;
+      let chosenLetter;
+      while (attempts++ < 3) {
+        const chosenIndex = Math.floor(random() * letters.length);
+        chosenLetter = letters[chosenIndex];
+        if (remainingPointsPerLetter[chosenLetter] - occurrence.times >= 0) break;
+      }
+
+      decodingTable[occurrence.result] = chosenLetter;
+      remainingPointsPerLetter[chosenLetter] -= occurrence.times;
+      if (remainingPointsPerLetter[chosenLetter] < pointValue) {
+        delete remainingPointsPerLetter[chosenLetter];
+      }
+    } else {
+      decodingTable[occurrence.result] = ' ';
+    }
+  }
+  return decodingTable;
+}
 
 function generateReverseTable(gridSize: number): ReverseTable {
   const reverseTable: ReverseTable = {};
@@ -173,51 +200,24 @@ function generateReverseTable(gridSize: number): ReverseTable {
   return reverseTable;
 }
 
-function generateDecodingTable(seed: number, reverseTable: ReverseTable): DecodingTable {
-  const occurrences: Occurrence[] = [];
-  for (const result of Object.keys(reverseTable) as any as number[]) {
-    occurrences.push({
-      result,
-      times: reverseTable[result].length
-    });
-  }
-  const sortedOccurrences = occurrences.sort((a, b) => b.times - a.times);
-
-  const availablePoints = sortedOccurrences.reduce((previous: number, current: Occurrence) => {
-    return previous + current.times
-  }, 0.);
-  const pointValue = availablePoints / Object.values(LETTER_DISTRIBUTION).reduce((p, v) => p + v, 0);
-  let remainingPointsPerLetter: Record<Letter, number> = {}
-  for (const letter of Object.keys(LETTER_DISTRIBUTION)) {
-    remainingPointsPerLetter[letter] = pointValue * LETTER_DISTRIBUTION[letter];
-  }
-
-  const decodingTable: DecodingTable = {};
-  const localRandom = randomGenerator(seed);
-  for (const occurrence of occurrences) {
-
-    let attempts = 0;
-    let chosenLetter;
-    while (attempts++ < 3) {
-      const letters = Object.keys(remainingPointsPerLetter);
-      const chosenIndex = Math.floor(localRandom() * letters.length);
-      chosenLetter = letters[chosenIndex];
-      if (remainingPointsPerLetter[chosenLetter] - occurrence.times > -2) break;
-    }
-
-    decodingTable[occurrence.result] = chosenLetter;
-    remainingPointsPerLetter[chosenLetter] -= occurrence.times;
-    if (remainingPointsPerLetter[chosenLetter] < 0) {
-      delete remainingPointsPerLetter[chosenLetter];
-    }
-  }
-  return decodingTable;
-}
-
 // ========= UTILITIES =========
 
 // https://stackoverflow.com/a/47593316
-function randomGenerator(seed) {
+
+function hash(str: string): number {
+  // MurmurHash3 (https://stackoverflow.com/a/47593316)
+  for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353),
+      h = h << 13 | h >>> 19;
+  return (function() {
+      h = Math.imul(h ^ h >>> 16, 2246822507);
+      h = Math.imul(h ^ h >>> 13, 3266489909);
+      return (h ^= h >>> 16) >>> 0;
+  })();
+}
+
+function randomGenerator(seed: number) {
+  // Mulberry32 generator https://stackoverflow.com/a/47593316
   return function() {
     var t = seed += 0x6D2B79F5;
     t = Math.imul(t ^ t >>> 15, t | 1);
