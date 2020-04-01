@@ -4,12 +4,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "start:prod": "cross-env TS_NODE_PROJECT=tsconfig.prod.json NODE_ENV=production node -r tsconfig-paths/register dist/src/index.js",
-    "build": "npm run build:server && npm run build:client",
     "build:client": "webpack --mode production --config frontend/webpack.config.js",
-    "build:server": "tsc",
-    "export": "npm run build && ts-node export.ts",
-    "clean": "rimraf ./dist ./dist-export static/dist"
+    "build:server": "tsc"
   },
   "dependencies": {
     "chalk": "^3.0.0",
