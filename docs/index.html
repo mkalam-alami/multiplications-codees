@@ -2,10 +2,27 @@
 <html>
 <head>
   <title>Multiplications codées</title>
+  <link rel="stylesheet" style="text/css" href="index.css" />
 </head>
 <body>
-  <div id="app">
-    Coucou {{ name }} !
+  <div id="app" v-cloak>
+    <h1>Multiplications codées</h1>
+    
+    <table class="grid">
+      <thead>
+        <tr>
+          <th class="corner">x</th>
+          <th v-for="i in constants.GRID_SIZE">{{ i }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="i in constants.GRID_SIZE">
+          <th>{{ i }}</th>
+          <td v-for="j in constants.GRID_SIZE">{{ j * i }}</td>
+        </tr>
+      </tbody>
+    </table>
+
   </div>
   <script src="./bundle.js"></script>
   <script src="/reload/reload.js"></script>

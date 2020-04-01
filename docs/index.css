@@ -1,0 +1,43 @@
+
+body {
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+[v-cloak] {
+    visibility: hidden;
+}
+
+.grid {
+    border-collapse: collapse;
+    margin: auto;
+    max-width: 600px;
+    border: 2px solid black;
+}
+.grid .corner {
+    font-size: 1.2rem;
+    vertical-align: center;
+    border: 2px solid black;
+}
+th, td {
+    padding: 5px;
+    width: 30px;
+    height: 30px;
+}
+th {
+    font-size: 1.1rem;
+    border: 1px solid black;
+}
+thead th {
+    border-bottom: 2px solid black;
+}
+tbody th {
+    border-right: 2px solid black;
+}
+
+td {
+    font-size: 1rem;
+    text-align: center;
+    border: 1px dotted gray;
+}
