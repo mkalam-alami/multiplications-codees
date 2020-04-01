@@ -56,7 +56,8 @@ function launch() {
       encodeInput: load('encodeInput'),
       decodeInput: load('decodeInput'),
       decodingTable: {},
-      name: 'les gens'
+      name: 'les gens',
+      hovered: { i: -1, j: -1 }
     },
     created() {
       if (!isValidGridSize(this.gridSize)) {
@@ -77,6 +78,12 @@ function launch() {
       },
       decodeMultiplication(i: number, j: number) {
         return decodeResult(i * j, this.decodingTable);
+      },
+      appendLetter(i: number, j: number) {
+        this.encodeInput += decodeResult(i * j, this.decodingTable);
+      },
+      letterClasses(i: number, j: number) {
+        return 'letter ' + ((i === this.hovered.i || j === this.hovered.j) ? 'hovered' : '');
       }
     },
     computed: {

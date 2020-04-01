@@ -32,10 +32,10 @@
           <th v-for="i in gridSizeNumber">{{ i }}</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody @mouseout="hovered = { i: -1, j: -1 }">
         <tr v-for="i in gridSizeNumber">
           <th>{{ i }}</th>
-          <td v-for="j in gridSizeNumber">{{ decodeMultiplication(i, j) }}</td>
+          <td v-for="j in gridSizeNumber" v-bind:class="letterClasses(i, j)" @mouseover="hovered = { i, j }" @click="appendLetter(i, j)">{{ decodeMultiplication(i, j) }}</td>
         </tr>
       </tbody>
     </table>

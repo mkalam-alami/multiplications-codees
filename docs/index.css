@@ -58,6 +58,13 @@ input[type=number] {
     vertical-align: center;
     border: 2px solid black;
 }
+.grid .letter.hovered {
+    background-color: #DDD;
+}
+.grid .letter.hovered:hover {
+    background-color: #AAA;
+    cursor: pointer;
+}
 th, td {
     padding: 5px;
     width: 30px;
