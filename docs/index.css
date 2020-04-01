@@ -81,9 +81,17 @@ td {
     border: 1px dotted gray;
 }
 
-.seed {
+.legend {
     font-size: 0.9rem;
 }
-.seed input {
+.legend input {
     font-size: 0.9rem;
+}
+
+a {
+    text-decoration: none;
+    color: #444;
+}
+a:hover {
+    text-decoration: underline;
 }
