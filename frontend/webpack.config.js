@@ -17,10 +17,13 @@ module.exports = {
     extensions: [ '.tsx', '.ts', '.js' ],
     plugins: [new TsconfigPathsPlugin({ 
       configFile: path.resolve(__dirname, 'tsconfig.json')
-    })]
+    })],
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    }
   },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, '../docs'),
-  },
+  }
 };

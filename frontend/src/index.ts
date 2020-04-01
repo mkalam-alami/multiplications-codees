@@ -1,6 +1,12 @@
 import log from "shared/core/log";
+import Vue from "vue";
 
-window.onload = async function runTest() {
-  log.info("Test")
-  document.getElementById('app')!.innerHTML = 'Test';
-}
+new Vue({
+  el: '#app',
+  data: {
+    name: 'les gens'
+  },
+  created() {
+    log.info("App initialized");
+  }
+})
