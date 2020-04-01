@@ -37,7 +37,9 @@ const LETTER_DISTRIBUTION: Record<Letter, number> = {
   Î: 1,  Ï: 1,
   Ô: 1,  Œ: 1,
   Ù: 1,  Û: 1,
-  Ç: 1
+  Ç: 1, ',': 1,
+  '\'': 1, '.': 1,
+  '!': 1, '?': 1
 };
 
 let failedOnce = false;
@@ -131,7 +133,7 @@ function launch() {
 // ========= VALIDATION =========
 
 function isValidGridSize(gridSize: number) {
-  return !isNaN(gridSize) && gridSize >= 10 && gridSize <= 20;
+  return !isNaN(gridSize) && gridSize >= 11 && gridSize <= 20;
 }
 
 // ========= SAVING / LOADING =========
