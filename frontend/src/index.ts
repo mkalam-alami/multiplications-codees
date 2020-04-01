@@ -33,8 +33,6 @@ const LETTER_DISTRIBUTION: Record<Letter, number> = {
   ' ': 5
 };
 
-const random = randomGenerator(Date.now());
-
 new Vue({
   el: '#app',
   data: {
@@ -114,14 +112,15 @@ function load(key: string): string {
 // ========= ENCODING / DECODING =========
 
 function encodeMessage(message: string, decodingTable: DecodingTable, reverseTable: ReverseTable) {
+  const localRandom = randomGenerator(message);
   const sanitizedMessage = message.trim().toUpperCase().replace(/[^A-Z ]/g, ' ');
   return sanitizedMessage
     .split('')
-    .map(letter => encodeLetter(letter, decodingTable, reverseTable))
+    .map(letter => encodeLetter(letter, decodingTable, reverseTable, localRandom))
     .join(' ');
 }
 
-function encodeLetter(letter: string, decodingTable: DecodingTable, reverseTable: ReverseTable) {
+function encodeLetter(letter: string, decodingTable: DecodingTable, reverseTable: ReverseTable, random: Function) {
   const matchingResults = Object.entries(decodingTable).filter((entry) => entry[1] === letter);
   const matchingMultiplications = matchingResults
     .map(entry => entry[0])
