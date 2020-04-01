@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "baseUrl": "..",
+    "paths": {
+      "src/*": ["frontend/src/*"],
+      "shared/*": ["shared/*"]
+    },
+    "esModuleInterop": true, 
+    "forceConsistentCasingInFileNames": true
+  }
+}

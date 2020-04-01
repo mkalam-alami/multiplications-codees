@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"],
+      "shared/*": ["shared/*"],
+      "frontend/*": ["frontend/*"]
+    },
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": [
+    "node_modules",
+    "frontend/**/*.ts"
+  ]
+}
