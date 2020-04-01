@@ -18,9 +18,9 @@ type ReverseTable = Record<number, Multiplication[]>;
 type DecodingTable = Record<number, Letter>;
 
 const LETTER_DISTRIBUTION: Record<Letter, number> = {
-  A: 8,  B: 1,
+  A: 7,  B: 1,
   C: 3,  D: 3,
-  E: 9,  F: 2,
+  E: 6,  F: 2,
   G: 1,  H: 1,
   I: 7,  J: 1,
   K: 1,  L: 6,
@@ -30,7 +30,14 @@ const LETTER_DISTRIBUTION: Record<Letter, number> = {
   S: 8,  T: 7,
   U: 6,  V: 2,
   W: 1,  X: 1,
-  Y: 1,  Z: 1
+  Y: 1,  Z: 1,
+  À: 1,  Â: 1,
+  É: 2,  È: 1,
+  Ê: 1,  Ë: 1,
+  Î: 1,  Ï: 1,
+  Ô: 1,  Œ: 1,
+  Ù: 1,  Û: 1,
+  Ç: 1
 };
 
 let failedOnce = false;
@@ -124,7 +131,7 @@ function launch() {
 // ========= VALIDATION =========
 
 function isValidGridSize(gridSize: number) {
-  return !isNaN(gridSize) && gridSize >= 8 && gridSize <= 20;
+  return !isNaN(gridSize) && gridSize >= 10 && gridSize <= 20;
 }
 
 // ========= SAVING / LOADING =========
@@ -151,7 +158,8 @@ function load(key: string): string {
 
 function encodeMessage(message: string, decodingTable: DecodingTable) {
   const localRandom = initializeRandom(hash(message));
-  const sanitizedMessage = latinize(message).trim().toUpperCase().replace(/[^A-Z ]/g, ' ');
+  const validLetters = Object.keys(LETTER_DISTRIBUTION).join('');
+  const sanitizedMessage = message.trim().toUpperCase().replace(new RegExp(`[^${validLetters}]`, 'g'), ' ');
   return sanitizedMessage
     .split(' ')
     .map(word => 
@@ -162,9 +170,15 @@ function encodeMessage(message: string, decodingTable: DecodingTable) {
 }
 
 function encodeLetter(letter: string, decodingTable: DecodingTable, random: Function) {
-  const matchingResults = Object.entries(decodingTable).filter((entry) => entry[1] === letter);
-  const chosenResultIndex = Math.floor(random() * matchingResults.length);
-  return matchingResults[chosenResultIndex][0];
+  let matchingResults = Object.entries(decodingTable).filter((entry) => entry[1] === letter);
+  if (matchingResults.length > 0) {
+    const chosenResultIndex = Math.floor(random() * matchingResults.length);
+    return matchingResults[chosenResultIndex][0];
+  } else if (matchingResults.length === 0 && latinize(letter) !== letter) {
+    return encodeLetter(letter, decodingTable, random);
+  } else {
+    return '';
+  }
 }
 
 function decodeMessage(message: string, decodingTable: DecodingTable) {
