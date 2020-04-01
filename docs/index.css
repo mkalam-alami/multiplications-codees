@@ -49,8 +49,7 @@ input[type=number] {
 
 .grid {
     border-collapse: collapse;
-    margin: auto;
-    margin-top: 30px;
+    margin: 30px auto;
     max-width: 600px;
     border: 2px solid black;
 }
@@ -83,6 +82,7 @@ td {
 
 .legend {
     font-size: 0.9rem;
+    margin: 5px auto;
 }
 .legend input {
     font-size: 0.9rem;

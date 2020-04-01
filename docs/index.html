@@ -29,20 +29,21 @@
       <thead>
         <tr>
           <th class="corner">x</th>
-          <th v-for="i in gridSize">{{ i }}</th>
+          <th v-for="i in gridSizeNumber">{{ i }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="i in gridSize">
+        <tr v-for="i in gridSizeNumber">
           <th>{{ i }}</th>
-          <td v-for="j in gridSize">{{ decodeMultiplication(i, j) }}</td>
+          <td v-for="j in gridSizeNumber">{{ decodeMultiplication(i, j) }}</td>
         </tr>
       </tbody>
     </table>
 
+    <p class="legend">Taille de la grille : <input type="number" v-model="gridSize" /></p>
     <p class="legend">Graine de génération de la grille : <input type="number" v-model="seed" /></p>
 
-    <p class="legend"><a href="https://github.com/mkalam-alami/multiplications-codees/blob/master/frontend/src/index.ts">Code source sur Github</a>
+    <p class="legend"><a href="https://github.com/mkalam-alami/multiplications-codees">Code source sur Github</a>
   </div>
   <script src="./bundle.js"></script>
   <script src="/reload/reload.js"></script>
