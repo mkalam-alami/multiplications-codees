@@ -17,6 +17,7 @@
     "koa": "^2.11.0",
     "koa-router": "^8.0.8",
     "koa-static": "^5.0.0",
+    "latinize": "^0.4.1",
     "reload": "^3.0.4",
     "ts-loader": "^6.2.1",
     "tsconfig-paths": "^3.9.0",

@@ -1,5 +1,6 @@
 import log from "shared/core/log";
 import Vue from "vue";
+import latinize from "latinize";
 
 type Letter = string;
 
@@ -29,8 +30,7 @@ const LETTER_DISTRIBUTION: Record<Letter, number> = {
   S: 8,  T: 7,
   U: 6,  V: 2,
   W: 1,  X: 1,
-  Y: 1,  Z: 1,
-  ' ': 5
+  Y: 1,  Z: 1
 };
 
 let failedOnce = false;
@@ -144,10 +144,13 @@ function load(key: string): string {
 
 function encodeMessage(message: string, decodingTable: DecodingTable) {
   const localRandom = initializeRandom(hash(message));
-  const sanitizedMessage = message.trim().toUpperCase().replace(/[^A-Z ]/g, ' ');
+  const sanitizedMessage = latinize(message).trim().toUpperCase().replace(/[^A-Z ]/g, ' ');
   return sanitizedMessage
-    .split('')
-    .map(letter => encodeLetter(letter, decodingTable, localRandom))
+    .split(' ')
+    .map(word => 
+        word.split('')
+          .map(letter => encodeLetter(letter, decodingTable, localRandom))
+          .join('/'))
     .join(' ');
 }
 
@@ -158,16 +161,18 @@ function encodeLetter(letter: string, decodingTable: DecodingTable, random: Func
 }
 
 function decodeMessage(message: string, decodingTable: DecodingTable) {
-  const sanitizedMessage = message.trim().toLowerCase().replace(/[^0-9 ]/g, '');
+  const sanitizedMessage = message.trim().toLowerCase().replace(/[^0-9/ ]/g, '');
   return sanitizedMessage
     .split(/ +/)
-    .map(resultString => {
-      const result = parseInt(resultString, 10);
-      return (Boolean(result)) ? result : undefined;
-    })
-    .filter(Boolean)
-    .map(result => decodeResult(result, decodingTable))
-    .join('');
+    .map(word => word.split('/')
+      .map(resultString => {
+        const result = parseInt(resultString, 10);
+        return (Boolean(result)) ? result : undefined;
+      })
+      .filter(Boolean)
+      .map(result => decodeResult(result, decodingTable))
+      .join(''))
+    .join(' ');
 }
 
 function decodeResult(result: number, decodingTable: DecodingTable): string {
