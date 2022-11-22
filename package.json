@@ -23,7 +23,7 @@
     "tsconfig-paths": "^3.9.0",
     "vue": "^2.6.11",
     "webpack": "^4.42.0",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.12"
   },
   "devDependencies": {
     "@types/find-package-json": "^1.1.1",
